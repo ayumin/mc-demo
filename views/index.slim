@@ -1,0 +1,87 @@
+doctype html
+html
+  head
+    title MC Demo Dashboard
+
+  css:
+    td { padding: 0px 5px }
+
+  body
+
+    h1 #{@mothership_name} - device mothership
+
+    form action='/reset' method='POST'
+      button Reset
+
+    h2 Processes
+    - if @warn_monitors
+      h4
+        | Warning: #{@monitor_count} monitor processes running, should be 1
+
+    - if @warn_web
+      h4
+        | Warning: #{@web_count} web processes running, should be &gt; 1
+
+    table
+      tr
+        td Web Dynos
+        td = @web_count
+      tr
+        td Monitors
+        td = @monitor_count
+      tr
+        td Devices
+        td = @device_count
+
+
+    h3 Logical Device Count
+    p
+     | Device Density (#{@device_density}) x Device Processes (#{@up_devices}) = #{@device_count}
+
+    h3 Web Dynos
+    table
+      tr
+        th Name
+        th State
+        th Command
+      - @web.each do |dyno|
+        tr
+          td = dyno['process']
+          td = dyno['pretty_state']
+          td
+            code = dyno['command']
+
+    h3 Virtual Device Simulators
+    table
+      tr
+        th Name
+        th State
+        th Command
+      - @devices.each do |dyno|
+        tr
+          td = dyno['process']
+          td = dyno['pretty_state']
+          td
+            code = dyno['command']
+
+    h2 Current ENV
+    table
+      - @mothership_env.each do |k, v|
+        tr
+          td = k
+          td = v
+
+    h1 l2tempo
+
+    - if @warn_l2tempo
+      h4  Warning: TEMPODB_API_KEY or TEMPODB_API_SECRET does not match mothership
+
+    form action='/update_tempodb' method='POST'
+      button Update Config
+
+    h2 Current ENV
+    table
+      - @l2tempo_env.each do |k, v|
+        tr
+          td = k
+          td = v
