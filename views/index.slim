@@ -11,7 +11,7 @@ html
     h1 #{@mothership_name} - device mothership
 
     form action='/reset' method='POST'
-      button Reset
+      button Reset Universe
 
     h2 Processes
     - if @warn_monitors
@@ -71,6 +71,12 @@ html
           td = k
           td = v
 
+    h1 Redis
+    table
+      tr
+        td keys
+        td = @redis_keys
+
     h1 l2tempo
 
     - if @warn_l2tempo
@@ -85,3 +91,4 @@ html
         tr
           td = k
           td = v
+

@@ -1,3 +1,5 @@
+require 'uri'
+
 class App < Sinatra::Base
   MOTHERSHIP = ENV['MOTHERSHIP_APP_NAME'] || 'mc-control'
   #BLACKLIST  = (ENV['MOTHERSHIP_ENV_BLACKLIST'] || 'REDISGREEN_URL,REDISTOGOURL').split(',')
@@ -8,6 +10,16 @@ class App < Sinatra::Base
 
   def heroku
     @heroku ||= Heroku::API.new
+  end
+
+  def redis
+    @redis ||= begin
+      mothership_env_h = heroku.get_config_vars(MOTHERSHIP).body
+      redis_url_env_name = mothership_env_h['REDIS_NAME']
+      redis_url = mothership_env_h[redis_url_env_name]
+      uri   = URI.parse(redis_url)
+      Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+    end
   end
 
   get '/' do
@@ -22,14 +34,14 @@ class App < Sinatra::Base
     @web_count = @web.size
     @warn_web  = @web_count == 0
     @devices   = @mothership_procs.select{ |p| p['process'] =~ /uuid_sensor/ }
-    @up_devices = @devices.select{ |p| p['state'] =~ /up|restart/ }.size
+    @up_devices = @devices.select{ |p| p['state'] =~ /up|start/ }.size
     @device_density = @mothership_env_h['SENSORS'].to_i
     @device_count = @up_devices * @device_density
     @l2tempo_env_h = heroku.get_config_vars(L2TEMPO).body
     @l2tempo_env   = @l2tempo_env_h.to_a.sort_by!{ |key,_v| key }
     @warn_l2tempo  = (@mothership_env_h['TEMPODB_API_KEY'] != @l2tempo_env_h['TEMPODB_API_KEY']) ||
                      (@mothership_env_h['TEMPODB_API_SECRET'] != @l2tempo_env_h['TEMPODB_API_SECRET'])
-
+    @redis_keys = redis.keys.size
     slim :index
   end
 
@@ -38,6 +50,7 @@ class App < Sinatra::Base
     heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50')
     reset_processes!
     cycle_tempodb!
+    reset_redis!
     redirect('/')
   end
 
@@ -80,5 +93,10 @@ class App < Sinatra::Base
     heroku.put_config_vars(MOTHERSHIP,
                            'TEMPODB_API_KEY' => tempo_config['TEMPODB_API_KEY'],
                            'TEMPODB_API_SECRET' => tempo_config['TEMPODB_API_SECRET'])
+  end
+
+  def reset_redis!
+    p 'reset_redis=true'
+    p redis.flushall
   end
 end
