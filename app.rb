@@ -73,9 +73,9 @@ class App < Sinatra::Base
     result << scale(MOTHERSHIP, 'monitor', 1)
     result << scale(MOTHERSHIP, 'web', 5)
     result << scale(MOTHERSHIP, 'uuid_sensor', 1)
-    result << scale(L2TEMPO, 'web', 5)
-    result << scale(L2CRM,   'web', 2)
-    result << scale(L2AIRSHIP, 'web', 2)
+    # result << scale(L2TEMPO, 'web', 5)
+    # result << scale(L2CRM,   'web', 2)
+    # result << scale(L2AIRSHIP, 'web', 2)
     $stdout.puts result.join("\n")
   end
 
