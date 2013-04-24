@@ -51,7 +51,7 @@ class App < Sinatra::Base
 
   # MAGIC CONSTANTS!!
   post '/reset' do
-    heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50')
+    heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN', params[:pushtoken])
     reset_processes!
     cycle_tempodb!
     reset_redis!
@@ -66,15 +66,6 @@ class App < Sinatra::Base
   post '/boot' do
     heroku.post_ps_scale(MOTHERSHIP, 'uuid_sensor', 20)
     redirect('/')
-  end
-
-  post "/startdemo" do
-    heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50')
-    reset_processes!
-    cycle_tempodb!
-    reset_redis!
-    update_pushtoken!(params[:pushtoken])
-    "ok"
   end
 
   def reset_processes!
@@ -106,10 +97,6 @@ class App < Sinatra::Base
     heroku.put_config_vars(MOTHERSHIP,
                            'TEMPODB_API_KEY' => tempo_config['TEMPODB_API_KEY'],
                            'TEMPODB_API_SECRET' => tempo_config['TEMPODB_API_SECRET'])
-  end
-
-  def update_pushtoken!(token)
-    heroku.put_config_vars(MOTHERSHIP, "PUSH_TOKEN" => token)
   end
 
   def reset_redis!
