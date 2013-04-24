@@ -60,15 +60,15 @@ class App < Sinatra::Base
 
   post '/reset/streamed' do
     stream do |out|
-      out << "Setting defaults..."
+      out << "Setting defaults...\n"
       heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN' => params[:pushtoken])
-      out << "Resetting processes..."
+      out << "Resetting processes...\n"
       reset_processes!
-      out << "Cycling TempoDB..."
+      out << "Cycling TempoDB...\n"
       cycle_tempodb!
-      out << "Resetting Redis"
+      out << "Resetting Redis\n"
       reset_redis!
-      out << "Demo Ready"
+      out << "Demo Ready\n"
     end
   end
 
