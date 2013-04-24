@@ -99,7 +99,7 @@ class App < Sinatra::Base
   end
 
   def cycle_tempodb!
-    p heroku.delete_addon(L2TEMPO, 'tempodb').body
+    p heroku.delete_addon(L2TEMPO, 'tempodb').body rescue nil
     p heroku.post_addon(L2TEMPO, 'tempodb:starter').body
     sleep 2
     update_tempodb!
