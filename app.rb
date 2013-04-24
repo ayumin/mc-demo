@@ -51,7 +51,7 @@ class App < Sinatra::Base
 
   # MAGIC CONSTANTS!!
   post '/reset' do
-    heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN', params[:pushtoken])
+    heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN' => params[:pushtoken])
     reset_processes!
     cycle_tempodb!
     reset_redis!
