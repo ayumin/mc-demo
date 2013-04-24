@@ -45,6 +45,10 @@ class App < Sinatra::Base
     slim :index
   end
 
+  use Rack::Auth::Basic, "Restricted Area" do |username, password|
+    username == "heroku" && password == ENV["HTTP_PASSWORD"]
+  end
+
   # MAGIC CONSTANTS!!
   post '/reset' do
     heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50')
@@ -62,6 +66,16 @@ class App < Sinatra::Base
   post '/boot' do
     heroku.post_ps_scale(MOTHERSHIP, 'uuid_sensor', 20)
     redirect('/')
+  end
+
+  post "/startdemo" do
+    heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50')
+    reset_processes!
+    cycle_tempodb!
+    update_tempodb!
+    update_pushtoken!(params[:pushtoken])
+    reset_redis!
+    "ok"
   end
 
   def reset_processes!
@@ -93,6 +107,10 @@ class App < Sinatra::Base
     heroku.put_config_vars(MOTHERSHIP,
                            'TEMPODB_API_KEY' => tempo_config['TEMPODB_API_KEY'],
                            'TEMPODB_API_SECRET' => tempo_config['TEMPODB_API_SECRET'])
+  end
+
+  def update_pushtoken!(token)
+    heroku.put_config_vars(MOTHERSHIP, "PUSH_TOKEN" => token)
   end
 
   def reset_redis!
