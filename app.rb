@@ -72,9 +72,8 @@ class App < Sinatra::Base
     heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50')
     reset_processes!
     cycle_tempodb!
-    update_tempodb!
-    update_pushtoken!(params[:pushtoken])
     reset_redis!
+    update_pushtoken!(params[:pushtoken])
     "ok"
   end
 
@@ -97,7 +96,7 @@ class App < Sinatra::Base
   def cycle_tempodb!
     p heroku.delete_addon(L2TEMPO, 'tempodb').body
     p heroku.post_addon(L2TEMPO, 'tempodb:starter').body
-    sleep 5
+    sleep 2
     update_tempodb!
   end
 
