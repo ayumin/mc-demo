@@ -58,6 +58,20 @@ class App < Sinatra::Base
     redirect('/')
   end
 
+  post '/reset/streamed' do
+    stream do |out|
+      out.puts "Setting defaults..."; out.flush
+      heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN' => params[:pushtoken])
+      out.puts "Resetting processes..."; out.flush
+      reset_processes!
+      out.puts "Cycling TempoDB..."; out.flush
+      cycle_tempodb!
+      out.puts "Resetting Redis..."; out.flush
+      reset_redis!
+      out.puts "Demo Ready"; out.flush
+    end
+  end
+
   post '/update_tempodb' do
     update_tempodb!
     redirect('/')
