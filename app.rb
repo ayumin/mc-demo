@@ -66,7 +66,7 @@ class App < Sinatra::Base
       reset_processes!
       out << "Cycling TempoDB...\n"
       cycle_tempodb!
-      out << "Resetting Redis\n"
+      out << "Resetting Redis...\n"
       reset_redis!
       out << "Demo Ready\n"
     end
