@@ -1,3 +1,4 @@
+require 'restclient'
 require 'uri'
 
 class App < Sinatra::Base
@@ -55,6 +56,7 @@ class App < Sinatra::Base
     reset_processes!
     cycle_tempodb!
     reset_redis!
+    reset_salesforce!
     redirect('/')
   end
 
@@ -68,6 +70,8 @@ class App < Sinatra::Base
       cycle_tempodb!
       out << "Resetting Redis...\n"
       reset_redis!
+      out << "Ressetting Salesforce...\n"
+      reset_salesforce!
       out << "Demo Ready\n"
     end
   end
@@ -117,4 +121,9 @@ class App < Sinatra::Base
     p 'reset_redis=true'
     p redis.flushall
   end
+
+  def reset_salesforce!
+    resource = RestClient.get "http://heroku:#{ENV["HTTP_PASSWORD"]}@l2crm.herokuapp.com/reset"
+  end
+
 end
