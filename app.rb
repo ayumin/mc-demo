@@ -53,6 +53,7 @@ class App < Sinatra::Base
   # MAGIC CONSTANTS!!
   post '/reset' do
     heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN' => params[:pushtoken])
+    heroku.put_config_vars(L2AIRSHIP, "PUSH_TOKEN" => params[:pushtoken])
     reset_processes!
     cycle_tempodb!
     reset_redis!
@@ -64,6 +65,7 @@ class App < Sinatra::Base
     stream do |out|
       out << "Setting defaults...\n"
       heroku.put_config_vars(MOTHERSHIP, 'SENSORS' => '50', 'PUSH_TOKEN' => params[:pushtoken])
+      heroku.put_config_vars(L2AIRSHIP, "PUSH_TOKEN" => params[:pushtoken])
       out << "Resetting processes...\n"
       reset_processes!
       out << "Cycling TempoDB...\n"
