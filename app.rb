@@ -4,10 +4,10 @@ require 'uri'
 class App < Sinatra::Base
   MOTHERSHIP = ENV['MOTHERSHIP_APP_NAME'] || 'mc-control'
   #BLACKLIST  = (ENV['MOTHERSHIP_ENV_BLACKLIST'] || 'REDISGREEN_URL,REDISTOGOURL').split(',')
-  L2TEMPO  = 'l2tempo'
-  L2CRM    = 'l2crm'
-  L2AIRSHIP = 'l2airship'
-  CONSUMER = 'mc-consumer'
+  L2TEMPO  = ENV['L2TEMP_APP_NAME'] || 'l2tempo'
+  L2CRM    = ENV['L2CRM_APP_NAME'] || 'l2crm'
+  L2AIRSHIP = ENV['L2AIRSHIP_APP_NAME'] ||'l2airship'
+  CONSUMER = ENV['CONSUMER_APP_NAME'] || 'mc-consumer'
 
   def heroku
     @heroku ||= Heroku::API.new
@@ -125,7 +125,7 @@ class App < Sinatra::Base
   end
 
   def reset_salesforce!
-    resource = RestClient.get "http://heroku:#{ENV["HTTP_PASSWORD"]}@l2crm.herokuapp.com/reset"
+    resource = RestClient.get "http://heroku:#{ENV["HTTP_PASSWORD"]}@#{L2CRM}.herokuapp.com/reset"
   end
 
 end
